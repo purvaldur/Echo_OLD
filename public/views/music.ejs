@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css">
+        <title>Echo</title>
+    </head>
+    <body id="musicPage">
+        <div id="musicApp" class="container">
+            <h1 class="title"> Echo is <b id="musicbotState">{{ state }}</b> in <b id="musicBotChannel">{{ channel }}</b></h1>
+            <h1 class="title error" v-bind:class="{infoActive: errorActive}">Error: {{ errorMessage }}</h1>
+            <h1 class="title info" v-bind:class="{infoActive: infoActive}">{{ infoMessage }}</h1>
+            <form v-on:submit="songSearch" onsubmit="return false" class="searchForm" action="">
+                <input ref="songField" type="text" name="" placeholder="SEARCH" value="">
+            </form>
+            <p class="currentSong">NOW PLAYING: <span id="currentSong">{{ song }}</span></p>
+            <div id="buttons" class="buttons">
+                <button v-on:click='nuke' type="button">NUKE</button>
+                <button v-on:click='joinToggle' id="joinToggle" type="button">{{ joinToggleText }}</button>
+                <button v-on:click='skip' type="button">SKIP</button>
+            </div>
+        </div>
+    </body>
+    <script src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.1/vue.js" charset="utf-8"></script>
+    <script src="../js/musicBotWeb.js" charset="utf-8"></script>
+</html>

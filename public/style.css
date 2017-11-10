@@ -1,0 +1,94 @@
+html {
+    height: 100%;
+}
+body {
+    font-family: sans-serif;
+    margin: 0px;
+}
+button:focus {outline:0;}
+#musicPage {
+    background: #e0d9c3;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#musicPage .container {
+    width: 900px;
+    height: 450px;
+    background: #3a4246;
+    position: relative;
+    z-index: -10
+    -webkit-box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
+    -moz-box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
+    box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
+}
+#musicPage .title {
+    color: #fff;
+    background: #71c986;
+    width: 100%;
+    line-height: 60px;
+    margin: 0px;
+    text-align: center;
+    font-weight: normal;
+    position: relative;
+    z-index: 1
+}
+#musicPage .error {
+    position: absolute;
+    background: #d25144;
+    margin-top: -60px;
+    transition: 1s;
+    z-index: 0
+}
+#musicPage .info {
+    position: absolute;
+    background: #3fa9ef;
+    margin-top: -60px;
+    transition: 1s;
+    z-index: 0
+}
+#musicPage .infoActive {
+    margin-top: 0px;
+}
+#musicPage .searchForm {
+    margin: 100px 60px 0px;
+}
+#musicPage .searchForm input {
+    width: 100%;
+    font-size: 3em;
+    background: #3a4246;
+    border: none;
+    border-bottom: 2px solid #4e5759;
+    color: #bdc3c7;
+}
+#musicPage .searchForm input:focus {
+    outline-width: 0;
+}
+#musicPage .currentSong {
+    margin: 14px 60px;
+    font-size: 2em;
+    color: #bdc3c7;
+}
+#musicPage .buttons {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-top: 4px solid #4e5759
+}
+#musicPage .buttons button {
+    height: 80px;
+    width: 25%;
+    border: none;
+    cursor: pointer;
+    font-size: 2em;
+    background: none;
+    color: #ecf0f1;
+    font-weight: bold;
+}
+#musicPage .buttons button:nth-child(2) {
+    flex-grow: 2;
+    background: #353c40
+}
