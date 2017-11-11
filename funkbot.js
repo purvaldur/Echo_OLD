@@ -6,6 +6,7 @@ const fs = require('fs');
 
 //INITIALIZERs
 const bot = new Discord.Client();
+const pm = new PlayMusic();
 const socket = io.connect('http://localhost:8080/musicBot');
 
 //SETUP - OTHER
@@ -13,6 +14,7 @@ const tokens = JSON.parse(fs.readFileSync(__dirname + '/tokens.json', 'utf8'));
 let monsterMash;
 let queue = [];
 let dispatcher = null;
+let linker;
 
 socket.on('connect', () => {
     console.log("connected");
@@ -30,6 +32,7 @@ function songPlay(queue) {
             } else {
                 socket.emit('botInfo', 'Reached end of queue');
                 socket.emit('songCurrent', 'nothing');
+                bot.user.setGame(`nothing`);
                 dispatcher = null;
             }
         })
@@ -81,14 +84,27 @@ bot.on('voiceStateUpdate', (oldMember, newMember) => {
         },5000);
     }
 });
+bot.on('message', message => {
+    if (message.content == "!link") {
+        console.log("link request");
+        socket.emit('botLinkRequest', message.author.id);
+        linker = message.author;
+    }
+});
 
 bot.login(tokens.botToken);
 
+socket.on('botLinkResponse', token => {
+    console.log("link response: " + token);
+    linker.send(token);
+    linker = null;
+});
 socket.on('musicSongSearch', song => {
     songSearch(song);
 });
 socket.on('musicBotJoin', id => {
     let memberTarget = monsterMash.members.get(id);
+    console.log(id);
     if (memberTarget.voiceChannel != undefined) {
         memberTarget.voiceChannel.join();
         socket.emit('botInfo', `Joining ${memberTarget.voiceChannel.name}`);

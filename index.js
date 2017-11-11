@@ -4,6 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const ejs = require('ejs');
 const path = require('path');
+const fs = require('fs');
 // const tokens = require('./tokens');
 
 app.use(express.static('public'));
@@ -14,6 +15,7 @@ app.set('views', path.join(__dirname, 'public/views'));
 let musicBotSocket = io.of('/musicBot');
 let musicWebSocket = io.of('/web');
 
+let musicWebData = JSON.parse(fs.readFileSync(__dirname + '/musicWebData.json', 'utf8'));
 let musicBotData = {
     musicbotOnline: "offline",
     voiceChannel: 'no channel',
@@ -33,7 +35,14 @@ io.on('connection', () => {
 });
 
 musicWebSocket.on('connection', socket => {
-    socket.emit('handshake',musicBotData)
+    socket.emit('handshake',musicBotData);
+    socket.on('musicWebLink', token => {
+        if (musicWebData.tokens[token]) {
+            socket.emit('webLinkSuccess',musicWebData.tokens[token]);
+            return;
+        }
+        socket.emit('botFail', "Invalid token")
+    });
     socket.on('musicBotJoin', id => {
         musicBotData.musicbotOnline != "online" ? socket.emit('botFail', 'Bot is offline') : musicBotSocket.emit('musicBotJoin', id);
     });
@@ -50,6 +59,23 @@ musicWebSocket.on('connection', socket => {
     });
 })
 musicBotSocket.on('connection', socket => {
+    socket.on('botLinkRequest', id => {
+        console.log("link request");
+        if (Object.keys(musicWebData.tokens).find(key => musicWebData.tokens[key] === id)) {
+            socket.emit('botLinkResponse', Object.keys(musicWebData.tokens).find(key => musicWebData.tokens[key] === id));
+            return;
+        }
+        console.log("not in if");
+        let token = Math.random().toString(36).slice(2);
+        if (token == musicWebData.tokens[token]) {
+            while (token == musicWebData.tokens[token]) {
+                token = Math.random().toString(36).slice(2);
+            }
+        }
+        musicWebData.tokens[token] = id;
+        fs.writeFileSync(__dirname + '/musicWebData.json', JSON.stringify(musicWebData));
+        socket.emit('botLinkResponse', token);
+    })
     socket.on('botStateUpdate', state => {
         musicBotData.musicbotOnline = state;
         musicWebSocket.emit('botStateUpdate', musicBotData.musicbotOnline)
