@@ -24,7 +24,10 @@ function songPlay(queue) {
     pm.getStreamUrl(queue[0].nid, (err,streamUrl) => {
         dispatcher = bot.voiceConnections.first().playStream(streamUrl, {seek:0, volume:0.15})
         socket.emit('songCurrent', `${queue[0].artist} - ${queue[0].song}`);
-        bot.user.setGame(`${queue[0].artist} - ${queue[0].song}`);
+        bot.ws.send({
+            op: 3,
+            d: { status: 'online', since: Date.now(), game: { name: `${queue[0].artist} - ${queue[0].song}`, type: 2 }, afk: false },
+        });
         dispatcher.on('end', () => {
             queue.shift();
             if (queue != 0) {
@@ -32,7 +35,10 @@ function songPlay(queue) {
             } else {
                 socket.emit('botInfo', 'Reached end of queue');
                 socket.emit('songCurrent', 'nothing');
-                bot.user.setGame(`nothing`);
+                bot.ws.send({
+                    op: 3,
+                    d: { status: 'online', since: Date.now(), game: { name: `${tokens.musicWebsite}/music`, type: 2 }, afk: false },
+                });
                 dispatcher = null;
             }
         })
@@ -64,6 +70,10 @@ function songSearch(song) {
 }
 
 bot.on('ready', () => {
+    bot.ws.send({
+        op: 3,
+        d: { status: 'online', since: Date.now(), game: { name: `${tokens.musicWebsite}/music`, type: 2 }, afk: false },
+    });
     monsterMash = bot.guilds.get('93733172440739840');
     socket.emit('botStateUpdate', "online");
     socket.emit('botInfo', "Echo is now online!");
@@ -72,7 +82,6 @@ bot.on('ready', () => {
 })
 bot.on('voiceStateUpdate', (oldMember, newMember) => {
     if (oldMember.voiceChannel == undefined) {
-        console.log(newMember.voiceChannel.members.size);
         return;
     }
     if (oldMember.voiceChannel.connection && oldMember.voiceChannel.id == oldMember.voiceChannel.connection.channel.id && oldMember.voiceChannel.connection.channel.members.size == 1) {
@@ -86,7 +95,6 @@ bot.on('voiceStateUpdate', (oldMember, newMember) => {
 });
 bot.on('message', message => {
     if (message.content == "!link") {
-        console.log("link request");
         socket.emit('botLinkRequest', message.author.id);
         linker = message.author;
     }
@@ -95,8 +103,7 @@ bot.on('message', message => {
 bot.login(tokens.botToken);
 
 socket.on('botLinkResponse', token => {
-    console.log("link response: " + token);
-    linker.send(token);
+    linker.send(`Your token is:\n**${token}**\n\nHere's the link to my web panel: ${tokens.musicWebsite} \nPaste the token into the "link" field if it prompts you, press enter, and then you're good to go!`);
     linker = null;
 });
 socket.on('musicSongSearch', song => {
@@ -104,7 +111,6 @@ socket.on('musicSongSearch', song => {
 });
 socket.on('musicBotJoin', id => {
     let memberTarget = monsterMash.members.get(id);
-    console.log(id);
     if (memberTarget.voiceChannel != undefined) {
         memberTarget.voiceChannel.join();
         socket.emit('botInfo', `Joining ${memberTarget.voiceChannel.name}`);
