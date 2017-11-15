@@ -1,5 +1,6 @@
 html {
     height: 100%;
+    overflow: hidden;
 }
 body {
     font-family: sans-serif;
@@ -14,14 +15,10 @@ button:focus {outline:0;}
     align-items: center;
 }
 #musicPage .container {
-    width: 900px;
-    height: 450px;
+    width: 100%;
+    height: 100%;
     background: #3a4246;
     position: relative;
-    z-index: -10
-    -webkit-box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
-    -moz-box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
-    box-shadow: 0px 24px 10px -10px rgba(0,0,0,0.4);
 }
 #musicPage .title {
     color: #fff;
@@ -52,23 +49,103 @@ button:focus {outline:0;}
     margin-top: 0px;
 }
 #musicPage .searchForm {
-    margin: 100px 60px 0px;
+    border-bottom: 2px solid #4e5759;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 #musicPage .searchForm input {
-    width: 100%;
+    width: 70%;;
     font-size: 3em;
     background: #3a4246;
     border: none;
+    margin: 40px;
     border-bottom: 2px solid #4e5759;
     color: #bdc3c7;
 }
 #musicPage .searchForm input:focus {
     outline-width: 0;
 }
-#musicPage .currentSong {
+#musicPage .queue {
     margin: 14px 60px;
+    color: #757575;
+    list-style: none;
+    max-height: 170px;
+    padding: 0px;
     font-size: 2em;
-    color: #bdc3c7;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+#musicPage .queue::-webkit-scrollbar-track {
+	border-radius: 10px;
+	background-color: #475054;
+}
+#musicPage .queue::-webkit-scrollbar {
+	width: 6px;
+	background-color: #475054;
+    border-radius: 10px;
+}
+#musicPage .queue::-webkit-scrollbar-thumb {
+	background-color: #bdc3c7;
+    border-radius: 10px;
+}
+
+#musicPage .queue .queueItem {
+}
+#musicPage .currentSong {
+    position: absolute;
+    bottom: 0px;
+    height: 120px;
+    width: 100%;
+    display: flex;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    border-top: 1px solid #222;
+    z-index: 1;
+}
+#musicPage .currentSong img {
+    height: 120px;
+    width: auto;
+}
+#musicPage .currentSong ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0px 10px;
+    font-size: 1.5em;
+    align-self: center;
+}
+#musicPage .currentSong ul li {
+    padding: 2px 0px;
+}
+#musicPage .currentSong .selector #time {
+    margin-left: -60px;
+    top: -20px;
+    line-height: 120px;
+    direction: ltr;
+    position: absolute;
+}
+#musicPage .currentSong .selector {
+    width: 260px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    background: #71c986;
+    font-size: 1.3em;
+}
+#musicPage .currentSong .selector img {
+    height: 60px;
+    margin: 0px 10px 0px 20px;
+    width: auto;
+    border-radius: 500px;
+}
+#musicPage .currentSongProgress {
+    height: 120px;
+    position: absolute;
+    bottom: 0px;
+    opacity: .25;
+    margin-left: 120px;
+    width: calc(100% - 380px); /* 120px (margin) + 260px (selector) = 380px; */
+    background: #71c986;
 }
 #musicPage .buttons {
     position: absolute;

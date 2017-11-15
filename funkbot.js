@@ -23,7 +23,7 @@ socket.on('connect', () => {
 function songPlay(queue) {
     pm.getStreamUrl(queue[0].nid, (err,streamUrl) => {
         dispatcher = bot.voiceConnections.first().playStream(streamUrl, {seek:0, volume:0.15})
-        socket.emit('songCurrent', `${queue[0].artist} - ${queue[0].song}`);
+        socket.emit('songCurrent', queue[0]);
         bot.ws.send({
             op: 3,
             d: { status: 'online', since: Date.now(), game: { name: `${queue[0].artist} - ${queue[0].song}`, type: 2 }, afk: false },
@@ -34,7 +34,7 @@ function songPlay(queue) {
                 songPlay(queue);
             } else {
                 socket.emit('botInfo', 'Reached end of queue');
-                socket.emit('songCurrent', 'nothing');
+                socket.emit('songCurrent', {albumArt:null,time:null,meta:{title:null,artist:null,album:null},selector:{avatar:null,name:null}});
                 bot.ws.send({
                     op: 3,
                     d: { status: 'online', since: Date.now(), game: { name: `${tokens.musicWebsite}/music`, type: 2 }, afk: false },
@@ -44,10 +44,9 @@ function songPlay(queue) {
         })
     })
 }
-function songSearch(song) {
+function songSearch(song, id) {
     pm.init({androidId: tokens.androidId, masterToken: tokens.androidMasterToken}, err => {
         if (err) console.log(err);
-        console.log(song);
         pm.search(song, 5, (err, res) => {
             if (err) console.log(err);
             if (res.entries == undefined || res.entries.filter(data => { return data.type == 1 }).shift() == undefined) {
@@ -55,9 +54,20 @@ function songSearch(song) {
                 return;
             }
             let song = res.entries.filter(data => { return data.type == 1 }).shift();
+            let selector = monsterMash.members.get(id)
+            console.log(selector);
             queue.push({
-                song: song.track.title,
-                artist: song.track.artist,
+                albumArt: song.track.albumArtRef[0].url,
+                time: song.track.durationMillis,
+                meta: {
+                    title: song.track.title,
+                    artist: song.track.artist,
+                    album: song.track.album
+                },
+                selector: {
+                    avatar: `https://cdn.discordapp.com/avatars/${selector.user.id}/${selector.user.avatar}.png`,
+                    name: `${selector.user.username}#${selector.user.discriminator}`
+                },
                 nid: song.track.storeId
             });
             socket.emit('botInfo', `{{ user }} put ${song.track.artist} - ${song.track.title} in queue`);
@@ -106,8 +116,8 @@ socket.on('botLinkResponse', token => {
     linker.send(`Your token is:\n**${token}**\n\nHere's the link to my web panel: ${tokens.musicWebsite} \nPaste the token into the "link" field if it prompts you, press enter, and then you're good to go!`);
     linker = null;
 });
-socket.on('musicSongSearch', song => {
-    songSearch(song);
+socket.on('musicSongSearch', data => {
+    songSearch(data.search, data.id);
 });
 socket.on('musicBotJoin', id => {
     let memberTarget = monsterMash.members.get(id);

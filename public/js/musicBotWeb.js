@@ -2,15 +2,34 @@ let socket = io('http://purvaldur.dk:8080/web');
 
 let identity;
 
+function milliTimeToMinutesSeconds(ms) {
+    return new Date(ms - 1000).toISOString().slice(14, -5);
+}
+
 let vue = new Vue({
     el: '#musicApp',
     data: {
         state: null,
         channel: null,
-        song: null,
         joinToggleText: 'JOIN',
         errorMessage: '{{ errorMessage }}',
         errorActive: false,
+        queue: [],
+        currentSong: {
+            albumArt: null,
+            time: null,
+            timeFormatted: null,
+            meta: {
+                title: null,
+                artist: null,
+                album: null
+            },
+            selector: {
+                avatar: null,
+                name: null
+            }
+        },
+        progressBar: {},
         linkCheck: function() {
             if (readCookie("link")) {
                 identity = readCookie("link");
@@ -31,7 +50,7 @@ let vue = new Vue({
             socket.emit('musicBotSkip');
         },
         songSearch: function() {
-            socket.emit('musicSongSearch', this.$refs.songField.value);
+            socket.emit('musicSongSearch', {search: this.$refs.songField.value,id:identity});
             this.$refs.songField.value = "";
         },
         userLink: function() {
@@ -45,7 +64,12 @@ socket.on('connect', () => {});
 socket.on('handshake', handshakeData => {
     vue.state = handshakeData.musicbotOnline;
     vue.channel = handshakeData.voiceChannel;
-    vue.song = handshakeData.songCurrent;
+    console.log(handshakeData);
+    vue.currentSong = handshakeData.songCurrent;
+    if (handshakeData.songCurrent.time) {
+        vue.currentSong.timeFormatted = milliTimeToMinutesSeconds(handshakeData.songCurrent.time);
+    }
+    vue.queue = handshakeData.queue;
 })
 socket.on('botStateUpdate', stateUpdate => {
     vue.state = stateUpdate;
@@ -57,7 +81,10 @@ socket.on('botChannelUpdate', channelUpdate => {
     vue.channel = channelUpdate;
 });
 socket.on('songCurrent', song =>{
-    vue.song = song;
+    vue.currentSong = song;
+    if (song.time) {
+        vue.currentSong.timeFormatted = milliTimeToMinutesSeconds(song.time)
+    }
 });
 socket.on('botFail', fail => {
     vue.errorMessage = fail;

@@ -19,7 +19,19 @@ let musicWebData = JSON.parse(fs.readFileSync(__dirname + '/musicWebData.json', 
 let musicBotData = {
     musicbotOnline: "offline",
     voiceChannel: 'no channel',
-    songCurrent: 'Nothing'
+    songCurrent: {
+        albumArt: null,
+        time: null,
+        meta: {
+            title: null,
+            artist: null,
+            album: null
+        },
+        selector: {
+            avatar: null,
+            name: null
+        }
+    }
 }
 
 app.get('/', function(req, res){
@@ -52,10 +64,10 @@ musicWebSocket.on('connection', socket => {
     socket.on('musicBotNuke', id => {
         musicBotData.musicbotOnline != "online" ? socket.emit('botFail', 'Bot is offline') : musicBotSocket.emit('musicBotNuke', id);
     });
-    socket.on('musicSongSearch', song => {
-        if (song.length == 0) {socket.emit('botFail', 'Search cannot be empty');return;}
+    socket.on('musicSongSearch', data => {
+        if (data.search.length == 0) {socket.emit('botFail', 'Search cannot be empty');return;}
         if (musicBotData.voiceChannel == 'no channel') {socket.emit('botFail', 'Bot is not in a voice channel');return;}
-        musicBotData.musicbotOnline != "online" ? socket.emit('botFail', 'Bot is offline') : musicBotSocket.emit('musicSongSearch', song);
+        musicBotData.musicbotOnline != "online" ? socket.emit('botFail', 'Bot is offline') : musicBotSocket.emit('musicSongSearch', data);
     });
 })
 musicBotSocket.on('connection', socket => {
