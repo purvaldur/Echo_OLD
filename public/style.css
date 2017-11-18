@@ -3,7 +3,7 @@ html {
     overflow: hidden;
 }
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0px;
 }
 button:focus {outline:0;}
@@ -19,6 +19,8 @@ button:focus {outline:0;}
     height: 100%;
     background: #3a4246;
     position: relative;
+    display: flex;
+    flex-flow: column;
 }
 #musicPage .title {
     color: #fff;
@@ -34,7 +36,7 @@ button:focus {outline:0;}
 #musicPage .error {
     position: absolute;
     background: #d25144;
-    margin-top: -60px;
+    margin-top: 0px;
     transition: 1s;
     z-index: 0
 }
@@ -46,13 +48,14 @@ button:focus {outline:0;}
     z-index: 0
 }
 #musicPage .infoActive {
-    margin-top: 0px;
+    margin-top: 60px;
 }
 #musicPage .searchForm {
     border-bottom: 2px solid #4e5759;
     width: 100%;
     display: flex;
     justify-content: center;
+    height: 180px;
 }
 #musicPage .searchForm input {
     width: 70%;;
@@ -67,34 +70,43 @@ button:focus {outline:0;}
     outline-width: 0;
 }
 #musicPage .queue {
-    margin: 14px 60px;
-    color: #757575;
     list-style: none;
-    max-height: 170px;
-    padding: 0px;
-    font-size: 2em;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    margin: 0px;
+    padding: 0px 0px 85px;
+    display: flex;
+    flex-flow: column-reverse;
+    height: 100%;
+    overflow: hidden;
 }
-#musicPage .queue::-webkit-scrollbar-track {
-	border-radius: 10px;
-	background-color: #475054;
+#musicPage .queue .queueItem:nth-child(even) {
+    background: #2c3235;
 }
-#musicPage .queue::-webkit-scrollbar {
-	width: 6px;
-	background-color: #475054;
-    border-radius: 10px;
+#musicPage .queue .queueItem {
+    width: 100%;
 }
-#musicPage .queue::-webkit-scrollbar-thumb {
-	background-color: #bdc3c7;
-    border-radius: 10px;
+#musicPage .queue .inQueue {
+    position: relative;
+    bottom: inherit;
 }
+/*#musicPage .queue::-webkit-scrollbar-track {*/
+	/*border-radius: 10px;*/
+	/*background-color: #475054;*/
+/*}*/
+/*#musicPage .queue::-webkit-scrollbar {*/
+	/*width: 6px;*/
+	/*background-color: #475054;*/
+    /*border-radius: 10px;*/
+/*}*/
+/*#musicPage .queue::-webkit-scrollbar-thumb {*/
+	/*background-color: #bdc3c7;*/
+    /*border-radius: 10px;*/
+/*}*/
 
 #musicPage .queue .queueItem {
 }
 #musicPage .currentSong {
     position: absolute;
-    bottom: 0px;
+    bottom: 85px;
     height: 120px;
     width: 100%;
     display: flex;
@@ -117,13 +129,6 @@ button:focus {outline:0;}
 #musicPage .currentSong ul li {
     padding: 2px 0px;
 }
-#musicPage .currentSong .selector #time {
-    margin-left: -60px;
-    top: -20px;
-    line-height: 120px;
-    direction: ltr;
-    position: absolute;
-}
 #musicPage .currentSong .selector {
     width: 260px;
     margin-left: auto;
@@ -138,14 +143,29 @@ button:focus {outline:0;}
     width: auto;
     border-radius: 500px;
 }
-#musicPage .currentSongProgress {
+#musicPage #time {
+    color: #fff;
+    top: -22px;
+    right: 10px;
+    line-height: 120px;
+    direction: ltr;
+    position: absolute;
+    font-size: 1.4em;
+}
+#musicPage .progressBarContainer {
     height: 120px;
     position: absolute;
-    bottom: 0px;
-    opacity: .25;
+    bottom: 85px;
     margin-left: 120px;
     width: calc(100% - 380px); /* 120px (margin) + 260px (selector) = 380px; */
+}
+#musicPage .currentSongProgress {
+    height: 100%;
+    opacity: .25;
     background: #71c986;
+    transition: 1s;
+    transition-timing-function: linear;
+    transform: translate3d(0, 0, 0);
 }
 #musicPage .buttons {
     position: absolute;
@@ -153,7 +173,7 @@ button:focus {outline:0;}
     width: 100%;
     display: flex;
     justify-content: center;
-    border-top: 4px solid #4e5759
+    border-top: 4px solid #4e5759;
 }
 #musicPage .buttons button {
     height: 80px;

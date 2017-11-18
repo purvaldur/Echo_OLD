@@ -12,29 +12,35 @@
             <h1 class="title error" v-bind:class="{infoActive: errorActive}">Error: {{ errorMessage }}</h1>
             <form v-if="!linkCheck()" v-on:submit="userLink" onsubmit="return false" class="searchForm">
                 <input ref="linkField" type="text" name="" placeholder="PASTE LINK TOKEN HERE" value="">
+                <p>Write <b>!link</b> to Echo in a PM and paste the link token he gives you into the field above</p>
             </form>
             <form v-if="linkCheck()" v-on:submit="songSearch" onsubmit="return false" class="searchForm" action="">
                 <input ref="songField" type="text" name="" placeholder="SEARCH" value="">
             </form>
-            <!-- <div v-if="linkCheck()" id="buttons" class="buttons">
+            <ul class="queue">
+                <li v-for="queueItem in queue" class="queueItem">
+                    <div class="currentSong inQueue">
+                        <img v-bind:src="queueItem.albumArt">
+                        <ul>
+                            <li>{{ queueItem.meta.title }}</li>
+                            <li>{{ queueItem.meta.artist }}</li>
+                            <li>{{ queueItem.meta.album }}</li>
+                        </ul>
+                        <div class="selector">
+                            <img v-bind:src="queueItem.selector.avatar">
+                            <p>{{ queueItem.selector.name }}</p>
+                        </div>
+                </li>
+            </ul>
+            <div v-if="linkCheck()" id="buttons" class="buttons">
                 <button v-on:click='nuke' type="button">NUKE</button>
                 <button v-on:click='joinToggle' id="joinToggle" type="button">{{ joinToggleText }}</button>
                 <button v-on:click='skip' type="button">SKIP</button>
-            </div> -->
-            <div class="currentSong">
-                <img v-bind:src="currentSong.albumArt">
-                <ul>
-                    <li>{{ currentSong.meta.title }}</li>
-                    <li>{{ currentSong.meta.artist }}</li>
-                    <li>{{ currentSong.meta.album }}</li>
-                </ul>
-                <div class="selector">
-                    <p id="time">{{ currentSong.timeFormatted }}</p>
-                    <img v-bind:src="currentSong.selector.avatar">
-                    <p>{{ currentSong.selector.name }}</p>
-                </div>
             </div>
-            <div v-bind:style="progressBar" class="currentSongProgress"></div>
+            <div class="progressBarContainer">
+                <div v-bind:style="progressBar" class="currentSongProgress"></div>
+                <p id="time">{{ currentSong.timeCurrentFormatted }} / {{ currentSong.timeFormatted }}</p>
+            </div>
         </div>
     </body>
     <script src="../js/tokens.js" charset="utf-8"></script>
