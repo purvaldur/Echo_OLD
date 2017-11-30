@@ -19,7 +19,7 @@
             </form>
             <ul class="queue">
                 <li v-for="queueItem in queue" class="queueItem">
-                    <div class="currentSong inQueue">
+                    <div class="currentSong inQueue" v-bind:class="{justAdded: queueItem.justAdded}">
                         <img v-bind:src="queueItem.albumArt">
                         <ul>
                             <li>{{ queueItem.meta.title }}</li>
@@ -31,15 +31,15 @@
                             <p>{{ queueItem.selector.name }}</p>
                         </div>
                 </li>
+                <div class="progressBarContainer">
+                    <div v-bind:style="progressBar" class="currentSongProgress"></div>
+                    <p id="time">{{ timeCurrentFormatted }} / {{ timeFormatted }}</p>
+                </div>
             </ul>
             <div v-if="linkCheck()" id="buttons" class="buttons">
                 <button v-on:click='nuke' type="button">NUKE</button>
                 <button v-on:click='joinToggle' id="joinToggle" type="button">{{ joinToggleText }}</button>
                 <button v-on:click='skip' type="button">SKIP</button>
-            </div>
-            <div class="progressBarContainer">
-                <div v-bind:style="progressBar" class="currentSongProgress"></div>
-                <p id="time">{{ currentSong.timeCurrentFormatted }} / {{ currentSong.timeFormatted }}</p>
             </div>
         </div>
     </body>

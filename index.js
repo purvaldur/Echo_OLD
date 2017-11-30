@@ -128,6 +128,9 @@ musicBotSocket.on('connection', socket => {
     socket.on('queueUpdate', queue => {
         musicBotData.queue = queue
         musicWebSocket.emit('queueUpdate', musicBotData.queue)
+        if (queue.type = 'songAdd') {
+            musicBotData.queue.queue[musicBotData.queue.queue.length-1].justAdded = false;
+        }
     })
     socket.on('botFail', fail => {
         musicWebSocket.emit('botFail', fail)

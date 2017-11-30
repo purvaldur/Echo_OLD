@@ -62,7 +62,7 @@ button:focus {outline:0;}
     font-size: 3em;
     background: #3a4246;
     border: none;
-    margin: 40px;
+    margin: 28px;
     border-bottom: 2px solid #4e5759;
     color: #bdc3c7;
 }
@@ -71,38 +71,48 @@ button:focus {outline:0;}
 }
 #musicPage .queue {
     list-style: none;
-    margin: 0px;
-    padding: 0px 0px 85px;
+    padding: 0px;
+    margin: 0px 0px 85px;
     display: flex;
     flex-flow: column-reverse;
     height: 100%;
-    overflow: hidden;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
-#musicPage .queue .queueItem:nth-child(even) {
+#musicPage .queue .queueItem:nth-child(even) .inQueue {
     background: #2c3235;
+}
+#musicPage .queue::-webkit-scrollbar-track {
+    display: none;
+	border-radius: 10px;
+    position: absolute;
+	background-color: #475054;
+}
+#musicPage .queue::-webkit-scrollbar {
+    display: none;
+    position: absolute;
+	width: 6px;
+	background-color: #475054;
+    border-radius: 10px;
+}
+#musicPage .queue::-webkit-scrollbar-thumb {
+    display: none;
+    position: absolute;
+	background-color: #bdc3c7;
+    border-radius: 10px;
 }
 #musicPage .queue .queueItem {
     width: 100%;
+    min-height: 120px;
+    height: 120px;
+    overflow: hidden;
+    transition: 1s;
 }
 #musicPage .queue .inQueue {
     position: relative;
     bottom: inherit;
-}
-/*#musicPage .queue::-webkit-scrollbar-track {*/
-	/*border-radius: 10px;*/
-	/*background-color: #475054;*/
-/*}*/
-/*#musicPage .queue::-webkit-scrollbar {*/
-	/*width: 6px;*/
-	/*background-color: #475054;*/
-    /*border-radius: 10px;*/
-/*}*/
-/*#musicPage .queue::-webkit-scrollbar-thumb {*/
-	/*background-color: #bdc3c7;*/
-    /*border-radius: 10px;*/
-/*}*/
-
-#musicPage .queue .queueItem {
+    transition: 1s;
 }
 #musicPage .currentSong {
     position: absolute;
@@ -114,6 +124,9 @@ button:focus {outline:0;}
     font-family: 'Roboto', sans-serif;
     border-top: 1px solid #222;
     z-index: 1;
+}
+#musicPage .queue .justAdded {
+    margin-top: 120px;
 }
 #musicPage .currentSong img {
     height: 120px;
@@ -155,8 +168,8 @@ button:focus {outline:0;}
 #musicPage .progressBarContainer {
     height: 120px;
     position: absolute;
-    bottom: 85px;
     margin-left: 120px;
+    overflow: hidden;
     width: calc(100% - 380px); /* 120px (margin) + 260px (selector) = 380px; */
 }
 #musicPage .currentSongProgress {

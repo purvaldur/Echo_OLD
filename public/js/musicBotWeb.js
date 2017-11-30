@@ -16,23 +16,13 @@ let vue = new Vue({
         errorMessage: '{{ errorMessage }}',
         errorActive: false,
         queue: [],
-        currentSong: {
-            albumArt: null,
-            time: null,
-            timeFormatted: "00:00",
-            timeCurrentFormatted: "00:00",
-            meta: {
-                title: null,
-                artist: null,
-                album: null
-            },
-            selector: {
-                avatar: null,
-                name: null
-            }
-        },
+        timeFormatted: "00:00",
+        timeCurrentFormatted: "00:00",
         progressBar: {
             width: "0%"
+        },
+        queueItem: {
+            marginBottom: "0px"
         },
         linkCheck: function() {
             if (readCookie("link")) {
@@ -69,12 +59,11 @@ socket.on('handshake', handshakeData => {
     vue.state = handshakeData.musicbotOnline
     vue.channel = handshakeData.voiceChannel
     console.log(handshakeData)
-    vue.currentSong = handshakeData.songCurrent
     if (handshakeData.songCurrent.time) {
-        vue.currentSong.timeFormatted = milliTimeToMinutesSeconds(handshakeData.songCurrent.time)
+        vue.timeFormatted = milliTimeToMinutesSeconds(handshakeData.songCurrent.time)
     } else {
-        vue.currentSong.timeFormatted = "00:00"
-        vue.currentSong.timeCurrentFormatted = "00:00"
+        vue.timeFormatted = "00:00"
+        vue.timeCurrentFormatted = "00:00"
     }
     vue.queue = handshakeData.queue.queue
 })
@@ -88,28 +77,33 @@ socket.on('botChannelUpdate', channelUpdate => {
     vue.channel = channelUpdate
 })
 socket.on('songCurrent', song =>{
-    vue.currentSong = song
     if (song.time) {
-        vue.currentSong.timeFormatted = milliTimeToMinutesSeconds(song.time)
+        vue.timeFormatted = milliTimeToMinutesSeconds(song.time)
     }
 })
 socket.on('songProgress', progress => {
-    if (progress.time == 1000) {
-        vue.currentSong.timeCurrentFormatted == "00:00"
-        vue.currentSong.timeFormatted == "00:00"
+    if (progress.time == 1000 || progress.time == 0) {
+        vue.timeCurrentFormatted == "00:00"
+        vue.timeFormatted == "00:00"
         return
     }
-    vue.currentSong.timeCurrentFormatted = milliTimeToMinutesSeconds(progress.time)
+    vue.timeCurrentFormatted = milliTimeToMinutesSeconds(progress.time)
     vue.progressBar.width = progress.width
 })
 socket.on('queueUpdate', queue => {
     console.log(queue);
     if (queue.type == "songEnd") {
-        vue.queue.shift()
+        vue.queue[0].justAdded = true;
+        setTimeout(() => {
+            vue.queue.splice(0,1)
+        },1000)
         return
     } else if (queue.type == "songAdd") {
         let newSong = queue.queue.pop()
         vue.queue.push(newSong)
+        setTimeout(() => {
+            vue.queue[vue.queue.length-1].justAdded = false;
+        },100)
     }
 })
 socket.on('botFail', fail => {

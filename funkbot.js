@@ -2,6 +2,7 @@
 const Discord = require('discord.js')
 const io = require('socket.io-client')
 const PlayMusic = require('playmusic')
+const youtubedl = require('youtube-dl')
 const fs = require('fs')
 
 //INITIALIZERs
@@ -23,7 +24,11 @@ socket.on('connect', () => {
     },2000)
 })
 
-function songPlay(queue) {
+function songPlay(queue,type) {
+    if (type == 'youtube') {
+        socket.emit('botFail', 'Youtube link!')
+        return
+    }
     pm.getStreamUrl(queue[0].nid, (err,streamUrl) => {
         dispatcher = bot.voiceConnections.first().playStream(streamUrl, {seek:0, volume:0.15})
         socket.emit('songCurrent', queue[0])
@@ -48,6 +53,20 @@ function songPlay(queue) {
     })
 }
 function songSearch(song, id) {
+    if (song.startsWith('https://www.youtube.com/watch?v=')) {
+        youtubedl.getInfo(song,[],{maxBuffer:1000*1024}, function(err,info) {
+            if (err) {
+                socket.emit('botFail', err)
+                return
+            }
+            console.log(`Uploader: ${info.uploader}`)
+            console.log(`Title: ${info.title}`)
+            console.log(`Thumb: ${info.thumbnail}`)
+            console.log(`URL: ${info.url}`)
+            songPlay(queue,'youtube')
+        })
+        return
+    }
     pm.init({androidId: tokens.androidId, masterToken: tokens.androidMasterToken}, err => {
         if (err) console.log(err)
         pm.search(song, 5, (err, res) => {
@@ -70,13 +89,15 @@ function songSearch(song, id) {
                     avatar: `https://cdn.discordapp.com/avatars/${selector.user.id}/${selector.user.avatar}.png`,
                     name: `${selector.user.username}#${selector.user.discriminator}`
                 },
-                nid: song.track.storeId
+                nid: song.track.storeId,
+                justAdded: true
             })
             socket.emit('queueUpdate', {queue:queue, type:"songAdd"})
+            queue[queue.length-1].justAdded = false;
             if (queue.length > 1) {
                 return
             }
-            songPlay(queue)
+            songPlay(queue,'google')
         })
     })
 }
@@ -112,10 +133,14 @@ bot.on('message', message => {
 bot.login(tokens.botToken)
 
 socket.on('botLinkResponse', token => {
-    linker.send(`Your token is:\n**${token}**\n\nHere's the link to my web panel: ${tokens.musicWebsite} \nPaste the token into the "link" field if it prompts you, press enter, and then you're good to go!`)
+    linker.send(`Your token is:\n**${token}**\n\nHere's the link to my web panel: ${tokens.musicWebsite}/music \nPaste the token into the "link" field if it prompts you, press enter, and then you're good to go!`)
     linker = null
 })
 socket.on('musicSongSearch', data => {
+    let requester = monsterMash.members.get(data.id);
+    if (requester.voiceChannel == undefined) {
+        socket.emit('botFail',  `${requester.user.username} is not in a voice channel`)
+    }
     songSearch(data.search, data.id)
 })
 socket.on('musicBotJoin', id => {
